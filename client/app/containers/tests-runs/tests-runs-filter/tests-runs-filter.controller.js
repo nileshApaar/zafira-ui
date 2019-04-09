@@ -385,6 +385,7 @@ const TestsRunsFilterController = function TestsRunsFilterController($scope, Fil
     }
 
     function createFilter() {
+        console.log(vm.filter)
         FilterService.createFilter(vm.filter).then(function (rs) {
             if (rs.success) {
                 alertify.success('Filter was created');
@@ -464,7 +465,7 @@ const TestsRunsFilterController = function TestsRunsFilterController($scope, Fil
         vm.filter.subject.criterias.push({
             name: vm.currentCriteria.value.name,
             operator: vm.currentOperator.value,
-            value: vm.currentValue.value && vm.currentValue.value.value ? vm.currentValue.value.value : vm.currentValue.value
+            value: new Date(vm.currentValue.value).toISOString().slice(0, 10) + ' 00:00:00',
         });
         clearFilterSlice();
     }
