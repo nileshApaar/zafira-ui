@@ -7,6 +7,9 @@
 
     function WidgetUtilService($location, projectsService) {
 
+        const ARRAY_TYPES = ["SELECT", "MULTISELECT", "CHECKBOX", 'array'];
+        const MULTI_TYPES = ["MULTISELECT", "CHECKBOX"];
+
         return {
             build: build,
             buildLegend: buildLegend
@@ -16,8 +19,11 @@
             var config = JSON.parse(widget.widgetTemplate.paramsConfig);
             var envParams = getENVParams(dashboard, userId);
             angular.forEach(config, function (paramValue, paramName) {
-                var type = paramValue.value ? getType(paramValue.value) :
+                var type = paramValue.type ? paramValue.type : paramValue.value ? getType(paramValue.value) :
                     paramValue.values && angular.isArray(paramValue.values) ? 'array' : undefined;
+                if(MULTI_TYPES.indexOf(type) !== -1) {
+                    paramValue.multiselect = true;
+                }
                 var isExistingWidget = widget.id && widget.paramsConfig && widget.paramsConfig.length;
                 var value = getValue(widget.paramsConfig, paramName, paramValue, type, isExistingWidget, envParams);
                 if(type) {
@@ -40,16 +46,16 @@
             var overrideWithEnvParams = !! envParams && !! envParams[paramName];
             if(isExistingWidget) {
                 var conf = JSON.parse(paramsConfig);
-                value = conf[paramName] ?  conf[paramName] :  type === 'array' ? paramValue.multiple ? paramValue.values : required ? paramValue.values[0] : undefined : paramValue.value;
+                value = conf[paramName] ?  conf[paramName] : ARRAY_TYPES.indexOf(type) !== -1 ? paramValue.multiple ? paramValue.values : required ? paramValue.values[0] : undefined : paramValue.value;
             } else {
-                value = type === 'array' ? paramValue.multiple ? paramValue.values && paramValue.values.length ? required ? [paramValue.values[0]] : undefined : paramValue.values : required ? paramValue.values[0] : undefined : paramValue.value;
+                value = ARRAY_TYPES.indexOf(type) !== -1 ? paramValue.multiple ? paramValue.values && paramValue.values.length ? required ? [paramValue.values[0]] : undefined : paramValue.values : required ? paramValue.values[0] : undefined : paramValue.value;
             }
             value = overrideWithEnvParams ?
-                type === 'array' &&  envParams && paramValue.values.indexOf(envParams[paramName]) !== -1 ?
+                ARRAY_TYPES.indexOf(type) !== -1 &&  envParams && paramValue.values.indexOf(envParams[paramName]) !== -1 ?
                     getValueByType(envParams[paramName], getType(value))
                     : value
                 : value;
-            value = paramValue.multiple && getType(value) !== 'array'? value ? [value] : [] : value;
+            value = paramValue.multiple && ARRAY_TYPES.indexOf(getType(value)) === -1 ? value ? [value] : [] : value;
             value = required ? value : value ? value : '';
             return value;
         };

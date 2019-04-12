@@ -21,17 +21,21 @@
             </div>
             <div ng-switch-when="2">
                 <ng-form class="zf-display-table" name="params">
-                    <div ng-if="paramValue.required && ! paramValue.hidden" class="widget-wizard_container_elements_input" ng-repeat="(paramName, paramValue) in widgetBuilder.paramsConfigObject track by $index" ng-switch="paramValue.type">
-                        <div class="zf-label">{{paramName}}</div>
-                        <div ng-switch-default>
+                    <div ng-if="paramValue.required && ! paramValue.hidden" class="widget-wizard_container_elements_input" ng-repeat="(paramName, paramValue) in widgetBuilder.paramsConfigObject track by $index">
+                        <div class="zf-label">
+                            <span ng-show="['TEXT'].indexOf(paramValue.type) === -1">
+                                {{paramName}}
+                            </span>
+                        </div>
+                        <div ng-if="['INPUT', 'NUMBER'].indexOf(paramValue.type) !== -1">
                             <zf-input-container>
-                                <input ng-attr-type="{{paramValue.type === 'int' ? 'number' : 'text'}}" ng-attr-name="{{paramName}}" ng-model="paramValue.value" placeholder="{{paramName}}" ng-change="buildConfigs(widget_form.params)" ng-required="true"/>
+                                <input ng-attr-type="{{paramValue.type === 'NUMBER' ? 'number' : 'text'}}" ng-attr-name="{{paramName}}" ng-model="paramValue.value" placeholder="{{paramName}}" ng-change="buildConfigs(widget_form.params)" ng-required="true"/>
                                 <div ng-messages="widget_form.params[paramName].$error" ng-if="widget_form.params[paramName].$dirty">
                                     <div ng-message="required">{{paramName}} required</div>
                                 </div>
                             </zf-input-container>
                         </div>
-                        <div ng-switch-when="array">
+                        <div ng-if="['SELECT', 'MULTISELECT', 'array'].indexOf(paramValue.type) !== -1">
                             <zf-input-container>
                                 <md-input-container>
                                     <label>{{paramName}}</label>
@@ -48,14 +52,39 @@
                                 </md-input-container>
                             </zf-input-container>
                         </div>
+                        <div ng-if="['RADIO'].indexOf(paramValue.type) !== -1">
+                            <zf-input-container>
+                                <md-input-container>
+                                    <md-radio-group ng-model="paramValue.value">
+                                        <md-radio-button ng-value="val" ng-repeat="val in paramValue.values" class="md-primary">{{val}}</md-radio-button>
+                                    </md-radio-group>
+                                </md-input-container>
+                            </zf-input-container>
+                        </div>
+                        <div ng-if="['CHECKBOX'].indexOf(paramValue.type) !== -1">
+                            <zf-input-container>
+                                <md-input-container>
+                                    <md-radio-group ng-model="paramValue.value" ng-disabled="! paramValue.input_enabled">
+                                        <md-radio-button ng-value="val" ng-repeat="val in paramValue.values" class="md-primary">{{val}}</md-radio-button>
+                                    </md-radio-group>
+                                </md-input-container>
+                            </zf-input-container>
+                        </div>
+                        <div ng-if="['TEXT'].indexOf(paramValue.type) !== -1">
+                            <div class="text-input">{{paramValue.value}}</div>
+                        </div>
                     </div>
                 </ng-form>
                 <ng-form class="zf-display-table" name="notRequiredparams">
-                    <div ng-if="! paramValue.required && ! paramValue.hidden" ng-show="showAdvanced || paramValue.input_enabled || paramValue.oldValue" class="widget-wizard_container_elements_input" ng-repeat="(paramName, paramValue) in widgetBuilder.paramsConfigObject track by $index" ng-switch="paramValue.type">
-                        <div class="zf-label">{{paramName}}</div>
-                        <div ng-switch-default>
+                    <div ng-if="! paramValue.required && ! paramValue.hidden" ng-show="showAdvanced || paramValue.input_enabled || paramValue.oldValue" class="widget-wizard_container_elements_input" ng-repeat="(paramName, paramValue) in widgetBuilder.paramsConfigObject track by $index">
+                        <div class="zf-label">
+                            <span ng-show="['TEXT'].indexOf(paramValue.type) === -1">
+                                {{paramName}}
+                            </span>
+                        </div>
+                        <div ng-if="['INPUT', 'NUMBER'].indexOf(paramValue.type) !== -1">
                             <zf-input-container>
-                                <input ng-attr-type="{{paramValue.type === 'int' ? 'number' : 'text'}}" ng-attr-name="{{paramName}}"
+                                <input ng-attr-type="{{paramValue.type === 'NUMBER' ? 'number' : 'text'}}" ng-attr-name="{{paramName}}"
                                        ng-model="paramValue.value" placeholder="{{paramName}}"
                                        ng-change="buildConfigs(widget_form.params)" ng-required="true"
                                        ng-disabled="! paramValue.input_enabled"/>
@@ -64,7 +93,7 @@
                                 </div>
                             </zf-input-container>
                         </div>
-                        <div ng-switch-when="array">
+                        <div ng-if="['SELECT', 'MULTISELECT', 'array'].indexOf(paramValue.type) !== -1">
                             <zf-input-container>
                                 <md-input-container>
                                     <label>{{paramName}}</label>
@@ -81,7 +110,28 @@
                                 </md-input-container>
                             </zf-input-container>
                         </div>
-                        <md-switch class="md-primary" ng-init="paramValue.input_enabled = paramValue.multiple ? !! paramValue.value && !! paramValue.value.length : !! paramValue.value" ng-model="paramValue.input_enabled" ng-change="switchInputEnabled(paramValue); buildConfigs(widget_form.params);" aria-label="extended_switch"></md-switch>
+                        <div ng-if="['RADIO'].indexOf(paramValue.type) !== -1">
+                            <zf-input-container>
+                                <md-input-container>
+                                    <md-radio-group ng-model="paramValue.value" ng-disabled="! paramValue.input_enabled">
+                                        <md-radio-button ng-value="val" ng-repeat="val in paramValue.values" class="md-primary">{{val}}</md-radio-button>
+                                    </md-radio-group>
+                                </md-input-container>
+                            </zf-input-container>
+                        </div>
+                        <div ng-if="['CHECKBOX'].indexOf(paramValue.type) !== -1">
+                            <zf-input-container>
+                                <md-input-container>
+                                    <md-radio-group ng-model="paramValue.value" ng-disabled="! paramValue.input_enabled">
+                                        <md-radio-button ng-value="val" ng-repeat="val in paramValue.values" class="md-primary">{{val}}</md-radio-button>
+                                    </md-radio-group>
+                                </md-input-container>
+                            </zf-input-container>
+                        </div>
+                        <div ng-if="['TEXT'].indexOf(paramValue.type) !== -1">
+                            <div class="text-input">{{paramValue.value}}</div>
+                        </div>
+                        <md-switch class="md-primary" ng-if="['TEXT'].indexOf(paramValue.type) === -1" ng-init="paramValue.input_enabled = paramValue.multiple ? !! paramValue.value && !! paramValue.value.length : !! paramValue.value" ng-model="paramValue.input_enabled" ng-change="switchInputEnabled(paramValue); buildConfigs(widget_form.params);" aria-label="extended_switch"></md-switch>
                     </div>
                 </ng-form>
                 <div ng-show="hasEmptyOptionalParams(false)" class="widget-wizard_container_elements_show-more" md-no-ink>

@@ -137,6 +137,32 @@ $wizard-white:          #ffffff;
                 md-select[disabled] > md-select-value {
                     background-image: none;
                 }
+                .text-input {
+                    font-size: 12px;
+                    font-weight: 500;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: center;
+                    color: rgba(0, 0, 0, 0.5);
+                }
+
+                md-input-container {
+                    height: 34px;
+                    width: 100%;
+                    font-size: 12px;
+
+                    md-radio-group {
+                        position: absolute;
+                        height: 34px;
+                        width: 100%;
+                        bottom: 0;
+                        line-height: 34px;
+                        md-radio-button {
+                            margin-right: 8px;
+                            display: inline-block;
+                        }
+                    }
+                }
             }
 
             &_show-more {
